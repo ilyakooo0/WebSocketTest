@@ -33,6 +33,10 @@ public func routes(_ router: Router) throws {
         }
         return post
     }
+    
+    router.get("posts") { (req) -> [Post] in
+        return Array(Post.storage.values)
+    }
 }
 
 enum DatabaseError: Error, AbortError {
