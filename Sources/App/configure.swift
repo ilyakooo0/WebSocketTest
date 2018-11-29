@@ -30,4 +30,13 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     migrations.add(model: Todo.self, database: .sqlite)
     services.register(migrations)
 
+    let ws = NIOWebSocketServer.default()
+    
+    ws.get("test") { (ws, req) in
+        ws.onText({ (ws, text) in
+            ws.send("\(text) pong")
+        })
+    }
+    
+    services.register(ws, as: WebSocketServer.self)
 }
