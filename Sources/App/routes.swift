@@ -17,4 +17,36 @@ public func routes(_ router: Router) throws {
     router.get("todos", use: todoController.index)
     router.post("todos", use: todoController.create)
     router.delete("todos", Todo.parameter, use: todoController.delete)
+    
+    router.get("user", Int.parameter) { (req) -> User in
+        let id = try req.parameters.next(Int.self)
+        guard let user = User.storage[id] else {
+            throw DatabaseError.notFound
+        }
+        return user
+    }
+    
+    router.get("post", Int.parameter) { req -> Post in
+        let id = try req.parameters.next(Int.self)
+        guard let post = Post.storage[id] else {
+            throw DatabaseError.notFound
+        }
+        return post
+    }
+}
+
+enum DatabaseError: Error, AbortError {
+    var status: HTTPResponseStatus {
+        return .notFound
+    }
+    
+    var reason: String {
+        return "Requested entry not found."
+    }
+    
+    var identifier: String {
+        return "Requested entry not found."
+    }
+        
+    case notFound
 }

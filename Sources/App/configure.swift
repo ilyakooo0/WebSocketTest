@@ -38,5 +38,23 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
         })
     }
     
+    ws.get("postUpdates", Int.parameter) { (ws, req) in
+        let i = OpenSockets.insert(ws)
+        ws.onClose.always {
+            OpenSockets.remove(at: i)
+        }
+        let update = EventResponse(token: try! req.parameters.next(Int.self))
+        ws.send(try! enc.encode(update))
+    }
+    
+    ws.get("postUpdates") { (ws, req) in
+        let i = OpenSockets.insert(ws)
+        ws.onClose.always {
+            OpenSockets.remove(at: i)
+        }
+        let update = EventResponse(token: nil)
+        ws.send(try! enc.encode(update))
+    }
+    
     services.register(ws, as: WebSocketServer.self)
 }
